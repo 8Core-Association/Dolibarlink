@@ -16,7 +16,6 @@ class AdminController extends Controller {
     }
 
     /**
-     * @AdminRequired
      * @NoCSRFRequired
      */
     public function saveSettings() {
@@ -47,7 +46,6 @@ class AdminController extends Controller {
     }
 
     /**
-     * @AdminRequired
      * @NoCSRFRequired
      */
     public function getSettings() {

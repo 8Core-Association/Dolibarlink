@@ -108,11 +108,13 @@
         
         fetch(OC.generateUrl('/apps/dolibarrlink/admin/save'), {
             method: 'POST',
-            body: data,
             headers: {
-                'requesttoken': OC.requestToken,
-                'OCS-APIRequest': 'true'
-            }
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                rules: JSON.stringify(currentRules),
+                enabled: enabled
+            })
         })
         .then(response => response.json())
         .then(data => {
