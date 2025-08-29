@@ -12,4 +12,7 @@
   <dependencies>
     <nextcloud min-version="25" max-version="30"/>
   </dependencies>
+  <settings>
+    <admin>OCA\DolibarrLink\Settings\AdminSettings</admin>
+  </settings>
 </info>

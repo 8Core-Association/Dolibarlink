@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dolibarr Link - Konfiguracija</title>
-    <link rel="stylesheet" href="../css/admin.css">
-</head>
-<body>
-    <div class="dolibarr-settings">
+<div class="dolibarr-settings">
         <h2>Konfiguracija Dolibarr Link</h2>
         
         <div class="setting-row">
@@ -46,8 +39,3 @@
         <div class="developer-info">
             <strong>Develop by: 8Core Association 2014-2025</strong>
         </div>
-    </div>
-    
-    <script src="../js/admin.js"></script>
-</body>
-</html>
