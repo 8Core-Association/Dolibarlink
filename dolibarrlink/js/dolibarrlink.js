@@ -3,40 +3,32 @@
     
     console.log('DolibarrLink: Script loaded successfully');
     
-    // Global status object for admin interface
+    // Global status object
     window.DolibarrLinkStatus = {
         lastScan: null,
         patchedCount: 0,
         enabled: true
     };
     
+    // Default rules (fallback)
     let rules = [
         {"type": "hrefContains", "value": "/dolibarr/"},
-        {"type": "title", "value": "Dolibarr"},
-        {"type": "hrefContains", "value": "dolibarr"}
+        {"type": "title", "value": "Dolibarr"}
     ];
     
-    // Load rules from server
-    loadRulesFromServer();
-    
-    function loadRulesFromServer() {
-        fetch(OC.generateUrl('/apps/dolibarrlink/admin/get'))
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    try {
-                        rules = JSON.parse(data.rules);
-                        window.DolibarrLinkStatus.enabled = data.enabled;
-                        console.log('DolibarrLink: Loaded', rules.length, 'rules from server');
-                    } catch (e) {
-                        console.error('DolibarrLink: Error parsing rules:', e);
-                    }
-                }
-            })
-            .catch(error => {
-                console.log('DolibarrLink: Using default rules (server not available)');
-            });
+    // Load rules from config if available
+    function loadConfig() {
+        if (window.DolibarrLinkConfig) {
+            rules = window.DolibarrLinkConfig.rules || rules;
+            window.DolibarrLinkStatus.enabled = window.DolibarrLinkConfig.enabled !== false;
+            console.log('DolibarrLink: Loaded', rules.length, 'rules from config');
+        } else {
+            console.log('DolibarrLink: Using default rules');
+        }
     }
+    
+    // Wait a bit for config to load, then initialize
+    setTimeout(loadConfig, 100);
     
     function matchesRule(link) {
         if (!window.DolibarrLinkStatus.enabled) return false;
