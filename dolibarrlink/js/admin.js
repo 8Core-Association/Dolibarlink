@@ -110,7 +110,8 @@
             method: 'POST',
             body: data,
             headers: {
-                'requesttoken': OC.requestToken
+                'requesttoken': OC.requestToken,
+                'OCS-APIRequest': 'true'
             }
         })
         .then(response => response.json())
