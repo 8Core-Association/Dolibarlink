@@ -1,6 +1,5 @@
 <?php
+// No routes needed for basic functionality
 return [
-  'routes' => [
-    ['name' => 'admin#setRules', 'url' => '/admin/rules', 'verb' => 'POST'],
-  ],
+  'routes' => [],
 ];

@@ -1,3 +1,3 @@
 <?php
-// Minimal app.php - just register the script
+// Simple app registration - just load the JavaScript
 \OCP\Util::addScript('dolibarrlink', 'dolibarrlink');
