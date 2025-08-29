@@ -9,23 +9,30 @@ use OCP\IConfig;
 use OCP\Util;
 
 class Admin implements ISettings {
-    private IConfig $config;
+    
+    /** @var IConfig */
+    private $config;
 
     public function __construct(IConfig $config) {
         $this->config = $config;
     }
 
-    public function getSection(): string { return 'dolibarrlink'; }
-    public function getPriority(): int { return 50; }
+    public function getSection(): string {
+        return 'dolibarrlink';
+    }
+    
+    public function getPriority(): int {
+        return 50;
+    }
+    
     public function getForm(): TemplateResponse {
-        $rules = $this->config->getAppValue('dolibarrlink','rules','[]');
+        $rules = $this->config->getAppValue('dolibarrlink', 'rules', '[]');
         
-        // Add the main script here instead of in app.php
-        Util::addScript('dolibarrlink', 'dolibarrlink');
+        // Load admin script
+        Util::addScript('dolibarrlink', 'admin');
         
-        return new TemplateResponse('dolibarrlink','settings/admin', [
-            'rules' => $rules,
-            'rulesJson' => $rules // Pass JSON directly to template
+        return new TemplateResponse('dolibarrlink', 'settings/admin', [
+            'rules' => $rules
         ], '');
     }
 }

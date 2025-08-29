@@ -1,33 +1,61 @@
-(function(){
-  'use strict';
-  
-  const form = document.getElementById('dlb-form');
-  if (!form || typeof OC === 'undefined') return;
-  
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    const rules = document.getElementById('rules').value || '[]';
+(function() {
+    'use strict';
     
-    // Validate JSON before sending
-    try {
-      JSON.parse(rules);
-    } catch(err) {
-      document.getElementById('dlb-status').textContent = 'Greška: Neispravan JSON format';
-      return;
-    }
-    
-    fetch(OC.generateUrl('/apps/dolibarrlink/admin/rules'), {
-      method: 'POST',
-      headers: {
-        'requesttoken': OC.requestToken, 
-        'Content-Type':'application/x-www-form-urlencoded'
-      },
-      body: 'rules=' + encodeURIComponent(rules)
-    }).then(r=>r.json()).then(j=>{
-      document.getElementById('dlb-status').textContent = j.ok ? 'Spremljeno.' : ('Greška: ' + (j.error||'nepoznato'));
-    }).catch((err)=>{ 
-      console.error('DolibarrLink error:', err);
-      document.getElementById('dlb-status').textContent='Mrežna greška'; 
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('dolibarr-admin-form');
+        const rulesTextarea = document.getElementById('dolibarr-rules');
+        const status = document.getElementById('dolibarr-status');
+        
+        if (!form || !rulesTextarea || !status) {
+            console.error('DolibarrLink: Required elements not found');
+            return;
+        }
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const rules = rulesTextarea.value.trim() || '[]';
+            
+            // Validate JSON
+            try {
+                JSON.parse(rules);
+            } catch (err) {
+                status.textContent = 'Error: Invalid JSON format';
+                status.style.color = 'red';
+                return;
+            }
+            
+            // Show loading
+            status.textContent = 'Saving...';
+            status.style.color = 'blue';
+            
+            // Send request
+            const url = OC.generateUrl('/apps/dolibarrlink/admin/rules');
+            const data = new FormData();
+            data.append('rules', rules);
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'requesttoken': OC.requestToken
+                },
+                body: data
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.ok) {
+                    status.textContent = 'Saved successfully!';
+                    status.style.color = 'green';
+                } else {
+                    status.textContent = 'Error: ' + (result.error || 'Unknown error');
+                    status.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                console.error('DolibarrLink save error:', error);
+                status.textContent = 'Network error';
+                status.style.color = 'red';
+            });
+        });
     });
-  });
 })();

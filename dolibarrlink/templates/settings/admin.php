@@ -1,15 +1,28 @@
-<?php script('dolibarrlink','admin'); ?>
-<script>
-// Pass rules to JavaScript the old-fashioned way for Nextcloud 30 compatibility
-window.DolibarrLinkRules = <?php p($_['rulesJson']); ?>;
-</script>
+<?php
+/** @var array $_ */
+script('dolibarrlink', 'admin');
+?>
+
 <div class="section">
-  <h2>Dolibarr Link</h2>
-  <p>Pravila u JSON formatu (po <code>title</code>, <code>hrefContains</code> ili <code>selector</code>).</p>
-  <form id="dlb-form">
-    <textarea id="rules" name="rules" rows="12" style="width:100%"><?php p($_['rules']); ?></textarea>
-    <br/>
-    <button class="primary" type="submit">Spremi</button>
-  </form>
-  <div id="dlb-status" class="hint"></div>
+    <h2><?php p($l->t('Dolibarr Link')); ?></h2>
+    <p><?php p($l->t('Configure rules to force certain links to open in the same tab.')); ?></p>
+    
+    <form id="dolibarr-admin-form">
+        <label for="dolibarr-rules"><?php p($l->t('Rules (JSON format):')); ?></label>
+        <textarea id="dolibarr-rules" name="rules" rows="10" style="width: 100%; font-family: monospace;"><?php p($_['rules']); ?></textarea>
+        
+        <div style="margin-top: 10px;">
+            <button type="submit" class="primary"><?php p($l->t('Save')); ?></button>
+            <span id="dolibarr-status" style="margin-left: 10px;"></span>
+        </div>
+    </form>
+    
+    <div style="margin-top: 20px;">
+        <h3><?php p($l->t('Example rules:')); ?></h3>
+        <pre style="background: #f5f5f5; padding: 10px; border-radius: 3px;">[
+  {"type": "title", "value": "Dolibarr"},
+  {"type": "hrefContains", "value": "/dolibarr/"},
+  {"type": "selector", "value": ".dolibarr-link"}
+]</pre>
+    </div>
 </div>

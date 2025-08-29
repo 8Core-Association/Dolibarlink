@@ -9,7 +9,9 @@ use OCP\IRequest;
 use OCP\IConfig;
 
 class AdminController extends Controller {
-    private IConfig $config;
+    
+    /** @var IConfig */
+    private $config;
 
     public function __construct(string $appName, IRequest $request, IConfig $config) {
         parent::__construct($appName, $request);
@@ -20,11 +22,18 @@ class AdminController extends Controller {
      * @AdminRequired
      */
     public function setRules(string $rules): DataResponse {
-        json_decode($rules, true);
+        // Validate JSON
+        $decoded = json_decode($rules, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return new DataResponse(['ok' => false, 'error' => 'Invalid JSON'], 400);
+            return new DataResponse([
+                'ok' => false, 
+                'error' => 'Invalid JSON: ' . json_last_error_msg()
+            ], 400);
         }
+        
+        // Save rules
         $this->config->setAppValue('dolibarrlink', 'rules', $rules);
+        
         return new DataResponse(['ok' => true]);
     }
 }

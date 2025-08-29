@@ -1,97 +1,117 @@
-(function(){
-  'use strict';
-  
-  // Try multiple ways to get rules for different Nextcloud versions
-  let rules = [];
-  
-  // Method 1: From global variable (Nextcloud 30 compatibility)
-  if (typeof window.DolibarrLinkRules !== 'undefined') {
-    rules = window.DolibarrLinkRules;
-  }
-  // Method 2: Try OCP.InitialState for newer versions
-  else if (typeof OCP !== 'undefined' && OCP.InitialState && OCP.InitialState.loadState) {
-    try {
-      rules = OCP.InitialState.loadState('dolibarrlink', 'rules') || [];
-    } catch(e) {
-      console.warn('DolibarrLink: Could not load rules from InitialState');
+(function() {
+    'use strict';
+    
+    console.log('DolibarrLink: Script loaded');
+    
+    // This will be loaded on all pages to patch links
+    // For now, we'll use a simple approach without complex state management
+    
+    let rules = [];
+    
+    // Try to get rules from various sources
+    function loadRules() {
+        // For now, we'll make an AJAX request to get the rules
+        // This is not ideal but works for Nextcloud 30
+        
+        if (typeof OC === 'undefined') {
+            console.warn('DolibarrLink: OC not available');
+            return;
+        }
+        
+        const url = OC.generateUrl('/apps/dolibarrlink/admin/rules');
+        
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'requesttoken': OC.requestToken || ''
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && Array.isArray(data.rules)) {
+                rules = data.rules;
+                console.log('DolibarrLink: Loaded rules:', rules);
+                scanAndPatchLinks();
+            }
+        })
+        .catch(error => {
+            console.warn('DolibarrLink: Could not load rules:', error);
+        });
     }
-  }
-  // Method 3: Try OC.InitialState for older versions
-  else if (typeof OC !== 'undefined' && OC.InitialState && OC.InitialState.loadState) {
-    try {
-      rules = OC.InitialState.loadState('dolibarrlink', 'rules') || [];
-    } catch(e) {
-      console.warn('DolibarrLink: Could not load rules from OC.InitialState');
+    
+    function matchesRule(link) {
+        return rules.some(rule => {
+            try {
+                if (!rule || typeof rule !== 'object') return false;
+                
+                switch (rule.type) {
+                    case 'title':
+                        return link.getAttribute('title') === rule.value;
+                    case 'hrefContains':
+                        const href = link.getAttribute('href') || '';
+                        return href.indexOf(rule.value) !== -1;
+                    case 'selector':
+                        return link.matches(rule.value);
+                    default:
+                        return false;
+                }
+            } catch (e) {
+                console.warn('DolibarrLink: Rule error:', e, rule);
+                return false;
+            }
+        });
     }
-  }
-  
-  if (!Array.isArray(rules)) {
-    console.warn('DolibarrLink: Invalid rules format, using empty array');
-    rules = [];
-  }
-  
-  console.log('DolibarrLink: Loaded rules:', rules);
-  
-  const match = (a) => {
-    return rules.some(r => {
-      try {
-        if (!r || typeof r !== 'object') return false;
-        if (r.type === 'title') return a.getAttribute('title') === r.value;
-        if (r.type === 'hrefContains') return (a.getAttribute('href') || '').indexOf(r.value) !== -1;
-        if (r.type === 'selector') return a.matches(r.value);
-      } catch(e) { 
-        console.warn('DolibarrLink rule error:', e, r);
-        return false; 
-      }
-      return false;
-    });
-  };
-  
-  const patchLink = (a) => {
-    if (!a || a.dataset._dlbPatched === '1' || !match(a)) return;
     
-    console.log('DolibarrLink: Patching link:', a.href);
+    function patchLink(link) {
+        if (!link || link.dataset.dolibarrPatched === '1') return;
+        if (!matchesRule(link)) return;
+        
+        console.log('DolibarrLink: Patching link:', link.href);
+        
+        link.setAttribute('target', '_self');
+        link.addEventListener('click', function(e) {
+            if (e.defaultPrevented) return;
+            if (e.button !== 0) return; // Only left click
+            if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return; // Allow shortcuts
+            
+            const href = link.getAttribute('href');
+            if (!href) return;
+            
+            console.log('DolibarrLink: Redirecting to:', href);
+            e.preventDefault();
+            window.location.href = href;
+        }, { capture: true });
+        
+        link.dataset.dolibarrPatched = '1';
+    }
     
-    a.setAttribute('target', '_self');
-    a.addEventListener('click', (e) => {
-      if (e.defaultPrevented) return;
-      if (e.button !== 0) return;                // samo LKM
-      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return; // pusti prečace
-      
-      const href = a.getAttribute('href');
-      if (!href) return;
-      
-      console.log('DolibarrLink: Redirecting to:', href);
-      e.preventDefault();
-      window.location.href = href;
-    }, {capture: true});
+    function scanAndPatchLinks() {
+        const links = document.querySelectorAll('a');
+        console.log('DolibarrLink: Scanning', links.length, 'links');
+        links.forEach(patchLink);
+    }
     
-    a.dataset._dlbPatched = '1';
-  };
-  
-  const scan = () => {
-    const links = document.querySelectorAll('a');
-    console.log('DolibarrLink: Scanning', links.length, 'links');
-    links.forEach(patchLink);
-  };
-  
-  // Initial scan
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', scan);
-  } else {
-    scan();
-  }
-  
-  // Watch for dynamic content
-  if (typeof MutationObserver !== 'undefined') {
-    const observer = new MutationObserver(() => {
-      scan();
-    });
-    observer.observe(document.documentElement, {
-      childList: true, 
-      subtree: true
-    });
-  }
-  
-  console.log('DolibarrLink: Initialized with', rules.length, 'rules');
+    // Initialize
+    function init() {
+        loadRules();
+        
+        // Watch for dynamic content
+        if (typeof MutationObserver !== 'undefined') {
+            const observer = new MutationObserver(function() {
+                scanAndPatchLinks();
+            });
+            observer.observe(document.documentElement, {
+                childList: true,
+                subtree: true
+            });
+        }
+    }
+    
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+    
 })();
