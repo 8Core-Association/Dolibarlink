@@ -1,41 +1,49 @@
-<div class="dolibarr-settings">
-        <h2>Konfiguracija Dolibarr Link</h2>
-        
+<?php
+script('dolibarrlink', 'admin');
+style('dolibarrlink', 'admin');
+?>
+
+<div class="section">
+    <h2><?php p($l->t('DolibarrLink Configuration')); ?></h2>
+    
+    <div class="dolibarr-settings">
         <div class="setting-row">
-            <h3>Osnovne postavke</h3>
+            <h3><?php p($l->t('Basic Settings')); ?></h3>
             <label>
                 <input type="checkbox" id="dolibarr-enabled" checked>
-                Omogući Dolibarr Link patchiranje
+                <?php p($l->t('Enable DolibarrLink patching')); ?>
             </label>
-            <p class="hint">Omogućava ili onemogućava patchiranje linkova na cijeloj stranici.</p>
+            <p class="hint"><?php p($l->t('Enables or disables link patching on the entire page.')); ?></p>
         </div>
         
         <div class="setting-row">
-            <h3>Pravila za poklapanje linkova</h3>
-            <p class="hint">Konfiguriraj koja pravila će se koristiti za prepoznavanje linkova koji se trebaju patchirati.</p>
+            <h3><?php p($l->t('Link Matching Rules')); ?></h3>
+            <p class="hint"><?php p($l->t('Configure which rules will be used to recognize links that need to be patched.')); ?></p>
             
             <div id="rules-container">
                 <!-- Rules will be populated by JavaScript -->
             </div>
             
-            <button id="add-rule" class="button">Dodaj pravilo</button>
-            <button id="test-rules" class="button">Testiraj pravila</button>
+            <button id="add-rule" class="button"><?php p($l->t('Add Rule')); ?></button>
+            <button id="test-rules" class="button"><?php p($l->t('Test Rules')); ?></button>
         </div>
         
         <div class="setting-row">
-            <button id="save-settings" class="button primary">Spremi postavke</button>
+            <button id="save-settings" class="button primary"><?php p($l->t('Save Settings')); ?></button>
             <span id="save-status"></span>
         </div>
         
         <div class="setting-row">
-            <h3>Trenutni status</h3>
+            <h3><?php p($l->t('Current Status')); ?></h3>
             <div id="status-info">
-                <p><strong>Status skripte:</strong> <span id="script-status">Učitavam...</span></p>
-                <p><strong>Zadnje skeniranje:</strong> <span id="last-scan">-</span></p>
-                <p><strong>Patchiranih linkova:</strong> <span id="links-patched">0</span></p>
+                <p><strong><?php p($l->t('Script Status:')); ?></strong> <span id="script-status"><?php p($l->t('Loading...')); ?></span></p>
+                <p><strong><?php p($l->t('Last Scan:')); ?></strong> <span id="last-scan">-</span></p>
+                <p><strong><?php p($l->t('Patched Links:')); ?></strong> <span id="links-patched">0</span></p>
             </div>
         </div>
         
         <div class="developer-info">
-            <strong>Develop by: 8Core Association 2014-2025</strong>
+            <strong><?php p($l->t('Develop by: 8Core Association 2014-2025')); ?></strong>
         </div>
+    </div>
+</div>
