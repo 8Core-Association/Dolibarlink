@@ -1,2 +1,3 @@
 <?php
-// Empty file - all functionality moved to settings
+// Minimal app.php - just register the script
+\OCP\Util::addScript('dolibarrlink', 'dolibarrlink');

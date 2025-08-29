@@ -4,7 +4,7 @@
   <name>Dolibarr Link</name>
   <summary>Force in-tab open for configured links</summary>
   <description>Patches selected links to open in same tab based on admin rules.</description>
-  <version>1.3.0</version>
+  <version>1.0.0</version>
   <licence>agpl</licence>
   <author>8Core</author>
   <namespace>DolibarrLink</namespace>
@@ -12,8 +12,4 @@
   <dependencies>
     <nextcloud min-version="25" max-version="30"/>
   </dependencies>
-  <settings>
-    <admin>OCA\DolibarrLink\Settings\Admin</admin>
-    <admin-section>OCA\DolibarrLink\Settings\Section</admin-section>
-  </settings>
 </info>
