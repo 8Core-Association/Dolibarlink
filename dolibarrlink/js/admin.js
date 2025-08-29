@@ -48,12 +48,12 @@
             ruleDiv.className = 'rule-item';
             ruleDiv.innerHTML = `
                 <select data-index="${index}" class="rule-type">
-                    <option value="hrefContains" ${rule.type === 'hrefContains' ? 'selected' : ''}>URL contains</option>
-                    <option value="title" ${rule.type === 'title' ? 'selected' : ''}>Title contains</option>
-                    <option value="textContent" ${rule.type === 'textContent' ? 'selected' : ''}>Text contains</option>
+                    <option value="hrefContains" ${rule.type === 'hrefContains' ? 'selected' : ''}>URL sadrži</option>
+                    <option value="title" ${rule.type === 'title' ? 'selected' : ''}>Title sadrži</option>
+                    <option value="textContent" ${rule.type === 'textContent' ? 'selected' : ''}>Tekst sadrži</option>
                 </select>
-                <input type="text" data-index="${index}" class="rule-value" value="${rule.value || ''}" placeholder="Enter value...">
-                <button class="delete-rule" data-index="${index}">Delete</button>
+                <input type="text" data-index="${index}" class="rule-value" value="${rule.value || ''}" placeholder="Unesite vrijednost...">
+                <button class="delete-rule" data-index="${index}">Obriši</button>
             `;
             container.appendChild(ruleDiv);
         });
@@ -99,7 +99,7 @@
         const enabled = document.getElementById('dolibarr-enabled').checked;
         const statusSpan = document.getElementById('save-status');
         
-        statusSpan.textContent = 'Saving...';
+        statusSpan.textContent = 'Spremam...';
         statusSpan.className = '';
         
         const data = new FormData();
@@ -116,7 +116,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                statusSpan.textContent = 'Saved successfully!';
+                statusSpan.textContent = 'Uspješno spremljeno!';
                 statusSpan.className = 'success';
                 
                 // Reload the main script with new settings
@@ -124,13 +124,13 @@
                     window.location.reload();
                 }, 1000);
             } else {
-                statusSpan.textContent = 'Error: ' + (data.message || 'Unknown error');
+                statusSpan.textContent = 'Greška: ' + (data.message || 'Nepoznata greška');
                 statusSpan.className = 'error';
             }
         })
         .catch(error => {
             console.error('Save error:', error);
-            statusSpan.textContent = 'Network error';
+            statusSpan.textContent = 'Mrežna greška';
             statusSpan.className = 'error';
         });
     }
@@ -165,7 +165,7 @@
             }
         });
         
-        alert(`Found ${matchCount} matching links on this page. They are highlighted in red for 3 seconds.`);
+        alert(`Pronađeno je ${matchCount} poklapajućih linkova na ovoj stranici. Označeni su crveno na 3 sekunde.`);
     }
     
     function updateStatus() {
@@ -175,7 +175,7 @@
         
         // Check if main script is loaded
         if (window.DolibarrLinkStatus) {
-            scriptStatus.textContent = 'Active';
+            scriptStatus.textContent = 'Aktivan';
             scriptStatus.className = 'active';
             
             if (window.DolibarrLinkStatus.lastScan) {
@@ -186,7 +186,7 @@
                 linksPatched.textContent = window.DolibarrLinkStatus.patchedCount;
             }
         } else {
-            scriptStatus.textContent = 'Inactive';
+            scriptStatus.textContent = 'Neaktivan';
             scriptStatus.className = 'inactive';
         }
     }

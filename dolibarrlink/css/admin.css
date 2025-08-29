@@ -86,3 +86,12 @@
 #script-status.inactive {
     color: var(--color-error);
 }
+
+.developer-info {
+    text-align: center;
+    padding: 15px;
+    background: var(--color-background-hover);
+    border-radius: 6px;
+    font-style: italic;
+    color: var(--color-text-maxcontrast);
+}

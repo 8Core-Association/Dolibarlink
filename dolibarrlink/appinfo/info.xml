@@ -2,11 +2,11 @@
 <info xmlns="http://nextcloud.org/ns">
   <id>dolibarrlink</id>
   <name>Dolibarr Link</name>
-  <summary>Force in-tab open for configured links</summary>
-  <description>Patches selected links to open in same tab based on configured rules.</description>
+  <summary>Prisilno otvaranje linkova u istom tabu</summary>
+  <description>Patchira odabrane linkove da se otvore u istom tabu na temelju konfiguriranih pravila.</description>
   <version>1.0.0</version>
   <licence>agpl</licence>
-  <author>8Core</author>
+  <author>8Core Association</author>
   <namespace>DolibarrLink</namespace>
   <category>customization</category>
   <dependencies>
