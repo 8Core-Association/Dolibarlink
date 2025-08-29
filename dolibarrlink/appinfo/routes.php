@@ -1,5 +1,7 @@
 <?php
-// No routes needed for basic functionality
 return [
-  'routes' => [],
+    'routes' => [
+        ['name' => 'admin#saveSettings', 'url' => '/admin/save', 'verb' => 'POST'],
+        ['name' => 'admin#getSettings', 'url' => '/admin/get', 'verb' => 'GET'],
+    ]
 ];

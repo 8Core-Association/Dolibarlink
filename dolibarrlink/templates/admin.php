@@ -9,7 +9,7 @@ style('dolibarrlink', 'admin');
     <div class="dolibarr-settings">
         <div class="setting-row">
             <label>
-                <input type="checkbox" id="dolibarr-enabled" <?php if ($_['enabled'] === '1') p('checked'); ?>>
+                <input type="checkbox" id="dolibarr-enabled" <?php if ($_['enabled']) p('checked'); ?>>
                 <?php p($l->t('Enable Dolibarr Link patching')); ?>
             </label>
             <p class="hint"><?php p($l->t('When enabled, links matching the rules below will be forced to open in the same tab.')); ?></p>
@@ -41,4 +41,12 @@ style('dolibarrlink', 'admin');
             </div>
         </div>
     </div>
+
+    <script>
+        // Pass PHP data to JavaScript
+        window.DolibarrLinkConfig = {
+            rules: <?php echo json_encode($_['rules']); ?>,
+            enabled: <?php echo json_encode($_['enabled']); ?>
+        };
+    </script>
 </div>

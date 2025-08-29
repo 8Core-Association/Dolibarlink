@@ -3,14 +3,44 @@
     
     console.log('DolibarrLink: Script loaded successfully');
     
-    // Hardcoded rules - you can modify these as needed
-    const rules = [
+    // Global status object for admin interface
+    window.DolibarrLinkStatus = {
+        lastScan: null,
+        patchedCount: 0,
+        enabled: true
+    };
+    
+    let rules = [
         {"type": "hrefContains", "value": "/dolibarr/"},
         {"type": "title", "value": "Dolibarr"},
         {"type": "hrefContains", "value": "dolibarr"}
     ];
     
+    // Load rules from server
+    loadRulesFromServer();
+    
+    function loadRulesFromServer() {
+        fetch(OC.generateUrl('/apps/dolibarrlink/admin/get'))
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    try {
+                        rules = JSON.parse(data.rules);
+                        window.DolibarrLinkStatus.enabled = data.enabled;
+                        console.log('DolibarrLink: Loaded', rules.length, 'rules from server');
+                    } catch (e) {
+                        console.error('DolibarrLink: Error parsing rules:', e);
+                    }
+                }
+            })
+            .catch(error => {
+                console.log('DolibarrLink: Using default rules (server not available)');
+            });
+    }
+    
     function matchesRule(link) {
+        if (!window.DolibarrLinkStatus.enabled) return false;
+        
         return rules.some(rule => {
             try {
                 switch (rule.type) {
@@ -20,6 +50,9 @@
                     case 'hrefContains':
                         const href = link.getAttribute('href') || '';
                         return href.toLowerCase().includes(rule.value.toLowerCase());
+                    case 'textContent':
+                        const text = link.textContent || '';
+                        return text.toLowerCase().includes(rule.value.toLowerCase());
                     default:
                         return false;
                 }
@@ -68,6 +101,10 @@
                 patchedCount++;
             }
         });
+        
+        // Update status
+        window.DolibarrLinkStatus.lastScan = Date.now();
+        window.DolibarrLinkStatus.patchedCount = patchedCount;
         
         if (patchedCount > 0) {
             console.log('DolibarrLink: Patched', patchedCount, 'links');

@@ -17,27 +17,38 @@ class AdminController extends Controller {
 
     /**
      * @NoAdminRequired
+     * @NoCSRFRequired
      */
-    public function saveSettings($rules, $enabled) {
+    public function saveSettings() {
         try {
-            // Validate and sanitize rules
+            $rules = $this->request->getParam('rules', '[]');
+            $enabled = $this->request->getParam('enabled', false);
+
+            // Validate JSON
             $decodedRules = json_decode($rules, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                return new JSONResponse(['status' => 'error', 'message' => 'Invalid JSON format']);
+                return new JSONResponse([
+                    'status' => 'error', 
+                    'message' => 'Invalid JSON format'
+                ]);
             }
 
-            // Save to config
+            // Save settings
             $this->config->setAppValue('dolibarrlink', 'rules', $rules);
             $this->config->setAppValue('dolibarrlink', 'enabled', $enabled ? '1' : '0');
 
             return new JSONResponse(['status' => 'success']);
         } catch (\Exception $e) {
-            return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()]);
+            return new JSONResponse([
+                'status' => 'error', 
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
     /**
      * @NoAdminRequired
+     * @NoCSRFRequired
      */
     public function getSettings() {
         try {
@@ -47,10 +58,13 @@ class AdminController extends Controller {
             return new JSONResponse([
                 'status' => 'success',
                 'rules' => $rules,
-                'enabled' => $enabled
+                'enabled' => $enabled === '1'
             ]);
         } catch (\Exception $e) {
-            return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()]);
+            return new JSONResponse([
+                'status' => 'error', 
+                'message' => $e->getMessage()
+            ]);
         }
     }
 }

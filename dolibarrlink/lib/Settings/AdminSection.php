@@ -28,6 +28,6 @@ class AdminSection implements IIconSection {
     }
 
     public function getIcon() {
-        return $this->urlGenerator->imagePath('dolibarrlink', 'app.svg');
+        return $this->urlGenerator->imagePath('core', 'actions/external.svg');
     }
 }

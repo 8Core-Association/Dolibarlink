@@ -18,22 +18,18 @@ class Admin implements ISettings {
     }
 
     public function getForm() {
-        // Get current rules from config
+        // Get current settings
         $rules = $this->config->getAppValue('dolibarrlink', 'rules', '[]');
         $enabled = $this->config->getAppValue('dolibarrlink', 'enabled', '1');
         
-        // Pass data to JavaScript
+        // Add JavaScript and CSS
         Util::addScript('dolibarrlink', 'admin');
-        Util::addInlineScript('dolibarrlink', 
-            'window.DolibarrLinkConfig = ' . json_encode([
-                'rules' => $rules,
-                'enabled' => $enabled
-            ]) . ';'
-        );
-
+        Util::addStyle('dolibarrlink', 'admin');
+        
+        // Pass data to template
         $parameters = [
             'rules' => $rules,
-            'enabled' => $enabled
+            'enabled' => $enabled === '1'
         ];
 
         return new TemplateResponse('dolibarrlink', 'admin', $parameters);
