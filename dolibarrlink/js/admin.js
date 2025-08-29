@@ -126,7 +126,7 @@
         const formData = new FormData();
         formData.append('enabled', enabled ? 'true' : 'false');
         formData.append('rules', JSON.stringify(currentRules));
-        formData.append('requesttoken', OC.requestToken);
+        formData.append('requesttoken', oc_requesttoken);
         
         fetch(baseUrl + '/admin/save', {
             method: 'POST',
