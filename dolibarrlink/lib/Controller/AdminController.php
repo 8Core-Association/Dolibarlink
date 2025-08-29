@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace OCA\DolibarrLink\Controller;
 
 use OCP\AppFramework\Controller;
@@ -7,11 +9,16 @@ use OCP\IRequest;
 use OCP\IConfig;
 
 class AdminController extends Controller {
-    public function __construct(string $appName, IRequest $request, private IConfig $config) {
+    private IConfig $config;
+
+    public function __construct(string $appName, IRequest $request, IConfig $config) {
         parent::__construct($appName, $request);
+        $this->config = $config;
     }
 
-    /** @AdminRequired @CSRFRequired */
+    /**
+     * @AdminRequired
+     */
     public function setRules(string $rules): DataResponse {
         json_decode($rules, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
