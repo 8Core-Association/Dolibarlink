@@ -21,15 +21,21 @@
     
     function loadInitialData() {
         try {
-            if (window.DolibarrLinkConfig) {
-                const config = window.DolibarrLinkConfig;
-                currentRules = JSON.parse(config.rules || '[]');
-                document.getElementById('dolibarr-enabled').checked = config.enabled;
+            // Load from localStorage first
+            const savedConfig = localStorage.getItem('dolibarrlink_config');
+            if (savedConfig) {
+                const config = JSON.parse(savedConfig);
+                currentRules = config.rules || [];
+                document.getElementById('dolibarr-enabled').checked = config.enabled !== false;
+                console.log('DolibarrLink Admin: Loaded config from localStorage');
             } else {
+                // Default rules
                 currentRules = [
                     {"type": "hrefContains", "value": "/dolibarr/"},
                     {"type": "title", "value": "Dolibarr"}
                 ];
+                document.getElementById('dolibarr-enabled').checked = true;
+                console.log('DolibarrLink Admin: Using default config');
             }
         } catch (e) {
             console.error('DolibarrLink Admin: Error loading config:', e);
@@ -102,40 +108,35 @@
         statusSpan.textContent = 'Spremam...';
         statusSpan.className = '';
         
-        const data = new FormData();
-        data.append('rules', JSON.stringify(currentRules));
-        data.append('enabled', enabled);
-        
-        fetch(OC.generateUrl('/apps/dolibarrlink/admin/save'), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                rules: JSON.stringify(currentRules),
-                enabled: enabled
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                statusSpan.textContent = 'Uspješno spremljeno!';
-                statusSpan.className = 'success';
-                
-                // Reload the main script with new settings
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            } else {
-                statusSpan.textContent = 'Greška: ' + (data.message || 'Nepoznata greška');
-                statusSpan.className = 'error';
-            }
-        })
-        .catch(error => {
-            console.error('Save error:', error);
-            statusSpan.textContent = 'Mrežna greška';
+        try {
+            // Save to localStorage
+            const config = {
+                enabled: enabled,
+                rules: currentRules
+            };
+            
+            localStorage.setItem('dolibarrlink_config', JSON.stringify(config));
+            
+            // Update global config
+            window.DolibarrLinkConfig = config;
+            
+            statusSpan.textContent = 'Uspješno spremljeno!';
+            statusSpan.className = 'success';
+            
+            console.log('DolibarrLink Admin: Settings saved to localStorage');
+            
+            // Trigger reload of main script
+            setTimeout(() => {
+                if (window.DolibarrLinkReload) {
+                    window.DolibarrLinkReload();
+                }
+            }, 500);
+            
+        } catch (error) {
+            console.error('DolibarrLink Admin: Save error:', error);
+            statusSpan.textContent = 'Greška pri spremanju!';
             statusSpan.className = 'error';
-        });
+        }
     }
     
     function testRules() {

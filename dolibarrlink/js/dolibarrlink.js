@@ -16,16 +16,39 @@
         {"type": "title", "value": "Dolibarr"}
     ];
     
-    // Load rules from config if available
+    // Load rules from config
     function loadConfig() {
-        if (window.DolibarrLinkConfig) {
-            rules = window.DolibarrLinkConfig.rules || rules;
-            window.DolibarrLinkStatus.enabled = window.DolibarrLinkConfig.enabled !== false;
-            console.log('DolibarrLink: Loaded', rules.length, 'rules from config');
-        } else {
+        try {
+            // First try localStorage (from admin interface)
+            const savedConfig = localStorage.getItem('dolibarrlink_config');
+            if (savedConfig) {
+                const config = JSON.parse(savedConfig);
+                rules = config.rules || rules;
+                window.DolibarrLinkStatus.enabled = config.enabled !== false;
+                console.log('DolibarrLink: Loaded', rules.length, 'rules from localStorage');
+                return;
+            }
+            
+            // Fallback to global config
+            if (window.DolibarrLinkConfig) {
+                rules = window.DolibarrLinkConfig.rules || rules;
+                window.DolibarrLinkStatus.enabled = window.DolibarrLinkConfig.enabled !== false;
+                console.log('DolibarrLink: Loaded', rules.length, 'rules from global config');
+                return;
+            }
+            
             console.log('DolibarrLink: Using default rules');
+        } catch (e) {
+            console.error('DolibarrLink: Error loading config:', e);
         }
     }
+    
+    // Reload function for admin interface
+    window.DolibarrLinkReload = function() {
+        console.log('DolibarrLink: Reloading configuration...');
+        loadConfig();
+        scanAndPatchLinks();
+    };
     
     // Wait a bit for config to load, then initialize
     setTimeout(loadConfig, 100);
